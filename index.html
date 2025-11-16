@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Milestone Planner</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <!-- =========================
+           ヘッダー
+      ========================== -->
+      <header class="top-bar">
+        <div>
+          <h1 class="app-title">Milestone Planner</h1>
+          <p class="app-subtitle">
+            マイルストーン（中長期計画）をブラウザ上で可視化・編集し、CSVで管理するツールです。
+          </p>
+        </div>
+      </header>
+
+      <!-- =========================
+           メインレイアウト
+      ========================== -->
+      <main class="main-layout">
+        <!-- --- CSV管理パネル --- -->
+        <section class="panel panel-csv">
+          <h2 class="panel-title">CSV管理</h2>
+          <div class="csv-controls">
+            <div class="csv-input-row">
+              <label for="csvFile" class="csv-label">CSVファイル：</label>
+              <input type="file" id="csvFile" accept=".csv,text/csv" />
+            </div>
+
+            <div class="csv-load-mode">
+              <span class="csv-label">読み込みモード：</span>
+              <label>
+                <input type="radio" name="loadMode" value="replace" checked />
+                置き換え（既存データを消して読み込む）
+              </label>
+              <label>
+                <input type="radio" name="loadMode" value="add" />
+                追加（既存データの末尾に追加）
+              </label>
+            </div>
+
+            <div class="csv-buttons">
+              <button id="btn-load-csv" class="primary-btn">CSV読み込み</button>
+              <button id="btn-export-csv" class="secondary-btn">
+                CSV書き出し
+              </button>
+            </div>
+
+            <p id="csv-message" class="csv-message"></p>
+
+            <p class="csv-note">
+              ・まずは
+              <a
+                href="sample/milestone_sample.csv"
+                download="milestone_sample.csv"
+                class="inline-link"
+              >
+                サンプルCSV
+              </a>
+              をダウンロードして書き換えるのがおすすめです。<br />
+              ・運用用のCSVは、プロジェクトフォルダ内に
+              <code>data</code>
+              フォルダを作り、その中に保存しておくと管理しやすくなります。<br />
+              ・詳しい説明は
+              <a
+                href="docs/usage.html"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="inline-link"
+              >
+                使い方ページ
+              </a>
+              を参照してください。
+            </p>
+          </div>
+        </section>
+
+        <!-- --- フィルタパネル --- -->
+        <section class="panel panel-filter">
+          <h2 class="panel-title">フィルタ</h2>
+          <div class="filter-grid">
+            <div class="filter-block">
+              <label for="searchText" class="filter-label">キーワード</label>
+              <input
+                type="text"
+                id="searchText"
+                placeholder="タイトル・カテゴリ・タグ・メモなどを横断検索"
+              />
+            </div>
+
+            <div class="filter-block">
+              <div class="filter-label">レベル</div>
+              <div id="levelFilterGroup" class="filter-chips">
+                <label>
+                  <input type="checkbox" value="L1" checked />
+                  L1（大目標）
+                </label>
+                <label>
+                  <input type="checkbox" value="L2" checked />
+                  L2（中目標）
+                </label>
+                <label>
+                  <input type="checkbox" value="L3" checked />
+                  L3（小タスク）
+                </label>
+              </div>
+            </div>
+
+            <div class="filter-block">
+              <div class="filter-label">状態</div>
+              <div id="statusFilterGroup" class="filter-chips">
+                <label>
+                  <input type="checkbox" value="not-started" checked />
+                  未着手
+                </label>
+                <label>
+                  <input type="checkbox" value="in-progress" checked />
+                  進行中
+                </label>
+                <label>
+                  <input type="checkbox" value="done" checked />
+                  完了
+                </label>
+                <label>
+                  <input type="checkbox" value="postponed" checked />
+                  延期
+                </label>
+              </div>
+            </div>
+
+            <div class="filter-block">
+              <label for="ownerFilter" class="filter-label">担当者</label>
+              <select id="ownerFilter">
+                <option value="">すべて</option>
+                <!-- script.js で動的に追加 -->
+              </select>
+            </div>
+          </div>
+
+          <div class="filter-actions">
+            <button id="btn-apply-filter" class="primary-btn">
+              フィルタ適用
+            </button>
+            <button id="btn-reset-filter" class="ghost-btn">
+              条件リセット
+            </button>
+          </div>
+        </section>
+
+        <!-- --- メインビュー（リスト＆タイムライン） --- -->
+        <section class="panel panel-main">
+          <div class="panel-header">
+            <h2 class="panel-title">マイルストーン一覧 / タイムライン</h2>
+            <div class="panel-header-actions">
+              <div id="view-tabs" class="view-tabs">
+                <button type="button" class="tab-btn active" data-view="list">
+                  リスト表示
+                </button>
+                <button type="button" class="tab-btn" data-view="timeline">
+                  タイムライン表示
+                </button>
+              </div>
+              <button id="btn-new" class="primary-btn">
+                ＋ 新規マイルストーン
+              </button>
+            </div>
+          </div>
+
+          <div class="view-panels">
+            <!-- リスト表示 -->
+            <div id="list-view" class="view-panel active">
+              <div class="table-wrapper">
+                <table class="milestone-table">
+                  <thead>
+                    <tr>
+                      <th data-sort="level">Lv</th>
+                      <th data-sort="title">タイトル</th>
+                      <th data-sort="category">カテゴリ</th>
+                      <th data-sort="period">期間</th>
+                      <th data-sort="status">状態</th>
+                      <th data-sort="priority">優先度</th>
+                      <th data-sort="owner">担当</th>
+                      <th data-sort="tags">タグ</th>
+                    </tr>
+                  </thead>
+                  <tbody id="listBody"></tbody>
+                </table>
+              </div>
+              <p id="list-empty" class="empty-message">
+                表示できるマイルストーンがありません。CSVを読み込むか、新規作成してください。
+              </p>
+            </div>
+
+            <!-- タイムライン表示 -->
+            <div id="timeline-view" class="view-panel">
+              <div id="timeline-container" class="timeline-container"></div>
+              <p id="timeline-empty" class="empty-message">
+                日付情報を持つマイルストーンがありません。開始日または終了日を設定してください。
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <!-- --- 詳細パネル --- -->
+        <aside class="panel panel-detail">
+          <h2 class="panel-title">詳細</h2>
+          <div id="detail-content" class="detail-content">
+            <p class="empty-message">
+              左のリストまたはタイムラインからマイルストーンを選択してください。
+            </p>
+          </div>
+        </aside>
+      </main>
+
+      <!-- =========================
+           フッター
+      ========================== -->
+      <footer class="app-footer">
+        <span id="footer-count">0件（表示中: 0件）</span>
+      </footer>
+
+      <!-- =========================
+           モーダル（新規・編集）
+      ========================== -->
+      <div id="milestone-modal" class="modal hidden">
+        <div class="modal-backdrop"></div>
+        <div class="modal-content">
+          <h2 id="modal-title" class="modal-title">マイルストーン編集</h2>
+          <form id="milestone-form" class="modal-form">
+            <!-- IDは隠し項目（新規時は空） -->
+            <input type="hidden" id="ms-id" />
+
+            <div class="form-row">
+              <label for="ms-title"
+                >タイトル<span class="required">*</span></label
+              >
+              <input
+                type="text"
+                id="ms-title"
+                required
+                placeholder="例：2026年度 科研費申請書の完成"
+              />
+            </div>
+
+            <div class="form-row form-row-inline">
+              <div>
+                <label for="ms-level">レベル</label>
+                <select id="ms-level">
+                  <option value="L1">L1（大目標）</option>
+                  <option value="L2" selected>L2（中目標）</option>
+                  <option value="L3">L3（小タスク）</option>
+                </select>
+              </div>
+              <div>
+                <label for="ms-category">カテゴリ</label>
+                <input
+                  type="text"
+                  id="ms-category"
+                  placeholder="例：研究 / 教育 / 運営 / 私生活"
+                />
+              </div>
+            </div>
+
+            <div class="form-row form-row-inline">
+              <div>
+                <label for="ms-start">開始日</label>
+                <input type="date" id="ms-start" />
+              </div>
+              <div>
+                <label for="ms-end">終了日</label>
+                <input type="date" id="ms-end" />
+              </div>
+            </div>
+
+            <div class="form-row form-row-inline">
+              <div>
+                <label for="ms-status">状態</label>
+                <select id="ms-status">
+                  <option value="not-started">未着手</option>
+                  <option value="in-progress">進行中</option>
+                  <option value="done">完了</option>
+                  <option value="postponed">延期</option>
+                </select>
+              </div>
+              <div>
+                <label for="ms-priority">優先度</label>
+                <select id="ms-priority">
+                  <option value="low">低</option>
+                  <option value="medium" selected>中</option>
+                  <option value="high">高</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-row form-row-inline">
+              <div>
+                <label for="ms-owner">担当者</label>
+                <input
+                  type="text"
+                  id="ms-owner"
+                  placeholder="例：Kaneko / 学生名など"
+                />
+              </div>
+              <div>
+                <label for="ms-tags">タグ（; 区切り）</label>
+                <input
+                  type="text"
+                  id="ms-tags"
+                  placeholder="例：2026計画;科研費;教育"
+                />
+              </div>
+            </div>
+
+            <div class="form-row">
+              <label for="ms-notes">メモ</label>
+              <textarea
+                id="ms-notes"
+                rows="4"
+                placeholder="補足事項やToDoのメモなどを自由に記載できます。"
+              ></textarea>
+            </div>
+
+            <div class="modal-actions">
+              <button type="submit" class="primary-btn">保存</button>
+              <button type="button" id="btn-modal-cancel" class="ghost-btn">
+                キャンセル
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>
