@@ -1,0 +1,4 @@
+id,title,level,category,start_date,end_date,status,priority,owner,tags,notes
+ms-ry23rb,メタ解析のCQ作成,L2,研究,2025-11-16,2025-12-31,not-started,medium,金子,,ニジャティさん、串間先生とメタ解析のCQを作成する
+ms-6i8ykd,マラセチアのPCR,L2,研究,2025-11-16,2025-12-31,in-progress,medium,金子,サルコイドーシス,マラセチアのgDNAおよびrRNAを用いたPCRを確立する
+ms-n1q4bj,マラセチアのPCR２,L2,研究,2025-11-16,2025-12-31,in-progress,medium,金子,サルコイドーシス,マラセチアのgDNAおよびrRNAを用いたPCRを確立する

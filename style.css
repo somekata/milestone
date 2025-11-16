@@ -1,0 +1,607 @@
+/* =========================
+   ベース
+========================= */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: #f3f4f6;
+  color: #111827;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+    "Liberation Mono", "Courier New", monospace;
+}
+
+/* =========================
+   レイアウト
+========================= */
+
+.app-shell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.top-bar {
+  padding: 16px 20px 8px;
+}
+
+.app-title {
+  margin: 0;
+  font-size: 1.4rem;
+}
+
+.app-subtitle {
+  margin: 4px 0 0;
+  font-size: 0.9rem;
+  color: #6b7280;
+}
+
+.main-layout {
+  display: grid;
+  grid-template-columns: 2.1fr 1.1fr;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: 12px;
+  padding: 0 20px 16px;
+  flex: 1;
+}
+
+/* パネル配置 */
+.panel {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 12px 14px;
+  box-shadow: 0 10px 25px rgba(15, 23, 42, 0.06);
+  border: 1px solid rgba(148, 163, 184, 0.4);
+}
+
+.panel-csv {
+  grid-column: 1 / 2;
+  grid-row: 1 / 2;
+}
+
+.panel-filter {
+  grid-column: 2 / 3;
+  grid-row: 1 / 2;
+}
+
+.panel-main {
+  grid-column: 1 / 2;
+  grid-row: 2 / 3;
+  display: flex;
+  flex-direction: column;
+}
+
+.panel-detail {
+  grid-column: 2 / 3;
+  grid-row: 2 / 3;
+}
+
+.panel-title {
+  margin: 0 0 8px;
+  font-size: 1rem;
+}
+
+/* =========================
+   ボタン
+========================= */
+
+.primary-btn,
+.secondary-btn,
+.ghost-btn {
+  appearance: none;
+  border-radius: 999px;
+  padding: 6px 12px;
+  border: none;
+  font-size: 0.86rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+
+.primary-btn {
+  background: #111827;
+  color: #f9fafb;
+}
+
+.primary-btn:hover {
+  background: #020617;
+}
+
+.secondary-btn {
+  background: #e5e7eb;
+  color: #111827;
+}
+
+.secondary-btn:hover {
+  background: #d1d5db;
+}
+
+.ghost-btn {
+  background: transparent;
+  color: #374151;
+  border: 1px solid #d1d5db;
+}
+
+.ghost-btn:hover {
+  background: #f9fafb;
+}
+
+.inline-link {
+  color: #2563eb;
+  text-decoration: none;
+}
+
+.inline-link:hover {
+  text-decoration: underline;
+}
+
+/* =========================
+   CSV管理パネル
+========================= */
+
+.csv-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 0.9rem;
+}
+
+.csv-input-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.csv-label {
+  font-size: 0.85rem;
+  color: #4b5563;
+}
+
+.csv-load-mode {
+  font-size: 0.86rem;
+}
+
+.csv-load-mode label {
+  margin-right: 12px;
+}
+
+.csv-buttons {
+  display: flex;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.csv-message {
+  font-size: 0.86rem;
+  color: #374151;
+}
+
+.csv-note {
+  font-size: 0.8rem;
+  color: #6b7280;
+}
+
+/* =========================
+   フィルタパネル
+========================= */
+
+.filter-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+  font-size: 0.9rem;
+}
+
+.filter-block {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.filter-label {
+  font-size: 0.82rem;
+  color: #4b5563;
+}
+
+.filter-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+  font-size: 0.84rem;
+}
+
+.filter-block input[type="text"],
+.filter-block select {
+  width: 100%;
+  padding: 4px 6px;
+  border-radius: 6px;
+  border: 1px solid #cbd5f5;
+  font-size: 0.88rem;
+}
+
+.filter-actions {
+  margin-top: 8px;
+  display: flex;
+  gap: 8px;
+}
+
+/* =========================
+   メインビュー（リスト／タイムライン）
+========================= */
+
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.panel-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.view-tabs {
+  display: inline-flex;
+  border-radius: 999px;
+  padding: 2px;
+  background: #e5e7eb;
+}
+
+.view-tabs .tab-btn {
+  border: none;
+  background: transparent;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.view-tabs .tab-btn.active {
+  background: #111827;
+  color: #f9fafb;
+}
+
+.view-panels {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.view-panel {
+  display: none;
+  height: 100%;
+}
+
+.view-panel.active {
+  display: block;
+}
+
+/* --- テーブル --- */
+
+.table-wrapper {
+  max-height: 360px;
+  overflow: auto;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+}
+
+.milestone-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.86rem;
+}
+
+.milestone-table th,
+.milestone-table td {
+  padding: 4px 6px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.milestone-table th {
+  background: #f9fafb;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.milestone-table tbody tr.selected {
+  background: #eff6ff;
+}
+
+/* --- 状態バッジ・優先度 --- */
+
+.badge-status {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 6px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  border: 1px solid #d1d5db;
+  background: #f9fafb;
+}
+
+.badge-status.not-started {
+  border-color: #e5e7eb;
+  background: #f9fafb;
+}
+
+.badge-status.in-progress {
+  border-color: #bfdbfe;
+  background: #eff6ff;
+}
+
+.badge-status.done {
+  border-color: #bbf7d0;
+  background: #ecfdf5;
+}
+
+.badge-status.postponed {
+  border-color: #fed7aa;
+  background: #fff7ed;
+}
+
+.priority-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  margin-right: 4px;
+}
+
+.priority-low {
+  background: #9ca3af;
+}
+
+.priority-medium {
+  background: #facc15;
+}
+
+.priority-high {
+  background: #ef4444;
+}
+
+/* --- タイムライン --- */
+
+.timeline-container {
+  position: relative;
+  min-height: 220px;
+  margin-top: 6px;
+}
+
+.timeline-grid {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  padding-top: 24px;
+}
+
+.timeline-axis {
+  position: relative;
+  height: 1px;
+  background: #d1d5db;
+  margin: 8px 0 18px;
+}
+
+.timeline-axis .tick {
+  position: absolute;
+  top: -6px;
+  width: 1px;
+  background: #9ca3af;
+  height: 12px;
+}
+
+.timeline-axis .tick-label {
+  position: absolute;
+  top: 12px;
+  left: -18px;
+  font-size: 0.72rem;
+  color: #6b7280;
+}
+
+.timeline-rows {
+  position: relative;
+  font-size: 0.8rem;
+}
+
+.timeline-row-label {
+  position: absolute;
+  left: 0;
+  transform: translateX(-2px);
+  font-size: 0.76rem;
+  color: #4b5563;
+}
+
+.timeline-bar {
+  position: absolute;
+  height: 18px;
+  border-radius: 999px;
+  font-size: 0.74rem;
+  padding: 0 6px;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+/* =========================
+   詳細パネル
+========================= */
+
+.detail-content {
+  font-size: 0.88rem;
+  max-height: 100%;
+  overflow: auto;
+}
+
+.detail-section {
+  margin-bottom: 8px;
+}
+
+.detail-label {
+  font-size: 0.76rem;
+  color: #6b7280;
+  margin-bottom: 2px;
+}
+
+.detail-value {
+  font-size: 0.88rem;
+}
+
+.detail-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.tag-pill {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 0.76rem;
+  background: #eff6ff;
+  color: #1d4ed8;
+}
+
+.detail-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+/* =========================
+   モーダル
+========================= */
+
+.modal {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+}
+
+.modal.hidden {
+  display: none;
+}
+
+.modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.4);
+}
+
+.modal-content {
+  position: absolute;
+  inset: 40px 16px 40px;
+  max-width: 640px;
+  margin: auto;
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 14px 16px;
+  box-shadow: 0 20px 50px rgba(15, 23, 42, 0.4);
+  overflow: auto;
+}
+
+.modal-title {
+  margin: 0 0 8px;
+  font-size: 1rem;
+}
+
+.modal-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 0.88rem;
+}
+
+.form-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.form-row-inline {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.form-row input[type="text"],
+.form-row input[type="date"],
+.form-row select,
+.form-row textarea {
+  border-radius: 6px;
+  border: 1px solid #cbd5f5;
+  padding: 4px 6px;
+  font-size: 0.88rem;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.required {
+  color: #ef4444;
+  margin-left: 2px;
+}
+
+/* =========================
+   その他
+========================= */
+
+.empty-message {
+  font-size: 0.86rem;
+  color: #6b7280;
+  margin-top: 6px;
+}
+
+.app-footer {
+  padding: 6px 20px 10px;
+  font-size: 0.8rem;
+  color: #6b7280;
+  text-align: right;
+}
+
+/* =========================
+   モバイル
+========================= */
+
+@media (max-width: 880px) {
+  .main-layout {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto auto;
+  }
+
+  .panel-csv,
+  .panel-filter,
+  .panel-main,
+  .panel-detail {
+    grid-column: 1 / 2;
+  }
+
+  .modal-content {
+    inset: 20px 10px 20px;
+  }
+}

@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Milestone Planner 使い方</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+      body {
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+          sans-serif;
+        line-height: 1.7;
+        margin: 0;
+        padding: 0;
+        background: #f3f4f6;
+        color: #111827;
+      }
+      .container {
+        max-width: 920px;
+        margin: 24px auto 40px;
+        padding: 0 16px;
+      }
+      header {
+        margin-bottom: 16px;
+      }
+      h1 {
+        font-size: 1.6rem;
+        margin: 0 0 4px;
+      }
+      .subtitle {
+        font-size: 0.9rem;
+        color: #6b7280;
+        margin: 0;
+      }
+      section {
+        background: #ffffff;
+        border-radius: 12px;
+        padding: 16px 18px;
+        margin-bottom: 14px;
+        box-shadow: 0 8px 20px rgba(15, 23, 42, 0.06);
+        border: 1px solid rgba(148, 163, 184, 0.3);
+      }
+      h2 {
+        font-size: 1.1rem;
+        margin-top: 0;
+        margin-bottom: 8px;
+      }
+      h3 {
+        font-size: 1rem;
+        margin-bottom: 4px;
+      }
+      code {
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+          "Liberation Mono", "Courier New", monospace;
+        font-size: 0.9em;
+        background: #f3f4f6;
+        padding: 2px 4px;
+        border-radius: 4px;
+      }
+      pre {
+        background: #111827;
+        color: #e5e7eb;
+        padding: 10px 12px;
+        border-radius: 8px;
+        overflow-x: auto;
+        font-size: 0.85rem;
+        margin: 8px 0;
+      }
+      ul,
+      ol {
+        padding-left: 1.2rem;
+        margin-top: 4px;
+      }
+      li {
+        margin: 2px 0;
+      }
+      .note {
+        font-size: 0.85rem;
+        color: #6b7280;
+      }
+      .back-link {
+        display: inline-block;
+        margin-top: 4px;
+        font-size: 0.85rem;
+      }
+      .back-link a {
+        color: #2563eb;
+        text-decoration: none;
+      }
+      .back-link a:hover {
+        text-decoration: underline;
+      }
+      .pill {
+        display: inline-block;
+        padding: 2px 8px;
+        border-radius: 999px;
+        font-size: 0.8rem;
+        background: #eff6ff;
+        color: #1d4ed8;
+        margin-right: 4px;
+      }
+      a {
+        color: #2563eb;
+      }
+      a:hover {
+        text-decoration: underline;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <h1>Milestone Planner 使い方</h1>
+        <p class="subtitle">
+          「中長期のマイルストーン」を CSV
+          で管理し、ブラウザで一覧とタイムライン表示を行うためのツールです。
+        </p>
+        <p class="back-link">← <a href="../index.html">ツール本体に戻る</a></p>
+      </header>
+
+      <section>
+        <h2>1. このツールでできること</h2>
+        <ul>
+          <li>
+            マイルストーン（大目標〜小タスク）を
+            <strong>CSVファイル</strong> で管理します。
+          </li>
+          <li>
+            ブラウザ上で <strong>リスト表示</strong> と
+            <strong>タイムライン表示</strong> ができます。
+          </li>
+          <li>
+            状態・担当者・期間などを編集し、再び
+            <strong>CSVとして書き出し</strong> できます。
+          </li>
+          <li>
+            処理はすべてブラウザ内で完結し、
+            <strong>サーバには送信されません</strong>。
+          </li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>2. フォルダ構成と「data フォルダ」</h2>
+        <p>想定しているフォルダ構成の例です。</p>
+        <pre><code>milestone-tool/
+├─ index.html            # ツール本体
+├─ style.css             # 見た目の設定
+├─ script.js             # ロジック
+├─ README.md
+├─ sample/
+│   └─ milestone_sample.csv   # サンプルデータ
+├─ docs/
+│   └─ usage.html        # このページ
+└─ data/                 # ★ 実際の運用用CSVを置くフォルダ</code></pre>
+        <p class="note">
+          ブラウザから
+          <code>data</code> フォルダに直接書き込むことはできません。<br />
+          書き出し時に表示される「名前を付けて保存」ダイアログで、<code
+            >data</code
+          >
+          フォルダを選んで保存してください。
+        </p>
+      </section>
+
+      <section>
+        <h2>3. CSV フォーマット</h2>
+        <p>CSV のヘッダ行は次の通りです。</p>
+        <pre><code>id,title,level,category,start_date,end_date,status,priority,owner,tags,notes</code></pre>
+
+        <h3>主な列の意味</h3>
+        <ul>
+          <li>
+            <code>id</code> : 任意のID（例: <code>ms-001</code>）。空でも可。
+          </li>
+          <li><code>title</code> : マイルストーン名（必須）。</li>
+          <li>
+            <code>level</code> :
+            <span class="pill">L1</span>
+            <span class="pill">L2</span>
+            <span class="pill">L3</span>
+            （大目標 / 中目標 / 小タスク）
+          </li>
+          <li>
+            <code>category</code> : 分類（例：研究 / 教育 / 運営 / 私生活
+            など）。
+          </li>
+          <li>
+            <code>start_date</code>, <code>end_date</code> :
+            日付（YYYY-MM-DD）。
+          </li>
+          <li>
+            <code>status</code> : <code>not-started</code> /
+            <code>in-progress</code> / <code>done</code> /
+            <code>postponed</code>
+          </li>
+          <li>
+            <code>priority</code> : <code>low</code> / <code>medium</code> /
+            <code>high</code>
+          </li>
+          <li><code>owner</code> : 担当者名やイニシャル（例：Kaneko）。</li>
+          <li>
+            <code>tags</code> : セミコロン区切りのタグ（例：
+            <code>2025計画;科研費;教育</code>）。
+          </li>
+          <li>
+            <code>notes</code> : メモ。カンマを含む場合は
+            <code>"..."</code> で囲みます。
+          </li>
+        </ul>
+
+        <p class="note">
+          まずは
+          <code>sample/milestone_sample.csv</code>
+          をコピーして編集すると、項目漏れが少なくて済みます。
+        </p>
+      </section>
+
+      <section>
+        <h2>4. 使い始める手順（最短ルート）</h2>
+
+        <h3>4.1 サンプルCSVから作る</h3>
+        <ol>
+          <li><code>sample/milestone_sample.csv</code> をコピーします。</li>
+          <li>
+            Excel や Google
+            スプレッドシートで開き、タイトルや日付などを書き換えます。
+          </li>
+          <li>文字コード UTF-8 の CSV として保存します。</li>
+          <li>
+            <code>data</code>
+            フォルダを作り、その中に保存しておくと整理しやすくなります。
+          </li>
+        </ol>
+
+        <h3>4.2 ツールを開く</h3>
+        <ol>
+          <li>
+            <code>milestone-tool</code> フォルダ内の
+            <code>index.html</code> をブラウザで開きます。
+          </li>
+          <li>Milestone Planner の画面が表示されます。</li>
+        </ol>
+
+        <h3>4.3 CSV を読み込む</h3>
+        <ol>
+          <li>画面左上「CSV管理」で、作成した CSV ファイルを選択します。</li>
+          <li>
+            読み込みモードを選びます：
+            <ul>
+              <li>
+                <strong>置き換え</strong
+                >：既存データをすべて消して、このCSVで上書き。
+              </li>
+              <li><strong>追加</strong>：既存データの末尾に追加。</li>
+            </ul>
+          </li>
+          <li>
+            「CSV読み込み」ボタンを押すと、件数が表示され、リストとタイムラインが更新されます。
+          </li>
+        </ol>
+      </section>
+
+      <section>
+        <h2>5. 画面の見方と編集</h2>
+
+        <h3>5.1 リスト表示</h3>
+        <ul>
+          <li>
+            「リスト表示」タブでは、マイルストーンが表形式で表示されます。
+          </li>
+          <li>
+            行をクリックすると、右側の「詳細」パネルに内容が表示されます。
+          </li>
+          <li>
+            ヘッダ（Lv / タイトル / 期間
+            など）をクリックすると、その列でソートできます。
+          </li>
+        </ul>
+
+        <h3>5.2 詳細パネルからの操作</h3>
+        <ul>
+          <li><strong>編集</strong>：モーダルが開き、内容を修正できます。</li>
+          <li>
+            <strong>複製して新規</strong>：同じ内容のマイルストーンを新しい ID
+            で追加します。
+          </li>
+          <li>
+            <strong>削除</strong>：確認のうえ、マイルストーンを削除します。
+          </li>
+        </ul>
+
+        <h3>5.3 タイムライン表示</h3>
+        <ul>
+          <li>
+            「タイムライン表示」タブでは、横軸が日付、縦方向がカテゴリごとのレーンになります。
+          </li>
+          <li>
+            レベル（L1 / L2 /
+            L3）によって色が変わり、全体の流れが一目でわかります。
+          </li>
+          <li>バーをクリックすると、詳細パネルが更新されます。</li>
+        </ul>
+
+        <h3>5.4 フィルタ</h3>
+        <ul>
+          <li>キーワード、レベル、状態、担当者で絞り込みができます。</li>
+          <li>
+            キーワードは、タイトル・カテゴリ・タグ・メモなどをまとめて検索します。
+          </li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>6. CSV に保存する（上書きのイメージ）</h2>
+        <ol>
+          <li>画面左上「CSV書き出し」ボタンをクリックします。</li>
+          <li>
+            対応ブラウザ（Chrome / Edge など）の場合：
+            <ul>
+              <li>OS の「名前を付けて保存」ダイアログが開きます。</li>
+              <li>
+                <code>data</code>
+                フォルダを選び、ファイル名を確認します（初期値：<code>milestones_YYYY-MM-DD.csv</code>）。
+              </li>
+              <li>
+                元の CSV と同じ名前にすれば「上書き保存」に近い運用ができます。
+              </li>
+            </ul>
+          </li>
+          <li>
+            Safari / Firefox などでは：
+            <ul>
+              <li>ファイル名を入力するダイアログが表示されます。</li>
+              <li>
+                その後、通常のダウンロードが行われます（保存先はブラウザの設定に依存）。
+              </li>
+            </ul>
+          </li>
+        </ol>
+
+        <p class="note">
+          ツール上で編集した内容は、<strong>自動では元のCSVに反映されません</strong>。<br />
+          変更を残したい場合は、必ず「CSV書き出し」で保存してください。
+        </p>
+      </section>
+
+      <section>
+        <h2>7. よくある質問</h2>
+        <h3>Q. オフラインでも使えますか？</h3>
+        <p>
+          A.
+          はい。フォルダ一式をローカルに置けば、インターネット接続なしで動作します。
+        </p>
+
+        <h3>Q. データはどこかのサーバに送信されますか？</h3>
+        <p>
+          A.
+          いいえ。CSVの読み込み・編集・書き出しはすべてブラウザ内で完結します。
+        </p>
+
+        <h3>Q. 列を増やしたい場合は？</h3>
+        <p>
+          A. 列を追加したい場合は、<code>script.js</code>
+          内の読み込み・書き出し処理の修正が必要です。<br />
+          まずは標準の11列に慣れてから拡張することをおすすめします。
+        </p>
+      </section>
+    </div>
+  </body>
+</html>
